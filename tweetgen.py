@@ -3,7 +3,6 @@ from keras import Input
 from keras.engine import Model
 from keras.layers import Lambda, Dense, Concatenate
 import keras.backend as K
-from keras.optimizers import SGD
 
 __author__ = 'christopher@levire.com'
 

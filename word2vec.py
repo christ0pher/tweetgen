@@ -1,7 +1,7 @@
 import pandas as pd
 from keras import Input
 from keras.engine import Model
-from keras.layers import Lambda, K, Concatenate, Dense, Maximum
+from keras.layers import Lambda, K, Dense, Maximum
 from keras.metrics import top_k_categorical_accuracy
 
 __author__ = 'christopher@levire.com'

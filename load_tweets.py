@@ -1,6 +1,6 @@
 import re
 
-from twitter import Twitter, OAuth, TwitterStream
+from twitter import Twitter, OAuth
 
 from twitter_credentials import CONFIG
 
