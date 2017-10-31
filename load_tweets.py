@@ -4,6 +4,8 @@ from twitter import Twitter, OAuth, TwitterStream
 
 from twitter_credentials import CONFIG
 
+BATCHES = 180
+
 __author__ = 'christopher@levire.com'
 
 
@@ -11,21 +13,20 @@ class CharStipper(dict):
 
     def __getitem__(self, k):
         el = chr(k)
-        if el in "!$%&'()*+,-./:;<=>?[\]^_`{|}~":
+        if el in "!$%&'()*+,-./:;<=>?[\]^_`{|}~\"":
             return None
         else:
             return k
-
 
 import os, ssl
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
     getattr(ssl, '_create_unverified_context', None)):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-USER = "realDonaldTrump"
+USER = "khloekardashian"
 
 OUTPUT_FILE = "./raw_data/"+USER+".txt"
-FRQ_CAP = 1
+FRQ_CAP = 2
 TRAIN_CSV = "./train_data/"+USER+".csv"
 TRAIN_METADATA = "./train_data/"+USER+"_meta.csv"
 TRAIN_VOCAB = "./train_data/"+USER+"_vocab.csv"
@@ -45,7 +46,7 @@ if __name__ == "__main__":
 
     rate_limit = results.rate_limit_remaining
     with open(OUTPUT_FILE, "w+") as rf:
-        for limit in range(1, int(180)):
+        for limit in range(1, int(BATCHES)):
 
             for msg in results:
                 if "retweeted_status" not in msg:
@@ -106,3 +107,6 @@ if __name__ == "__main__":
         for k, v in vocab_list.items():
             meta_file.write(str(k) + "," + str(v)+"\n")
 
+    with open(TRAIN_METADATA, "w+") as meta_file:
+        meta_file.write("m, features, word_vec_len\n")
+        meta_file.write(str(1)+","+str(1)+","+str(len(vocab_list))+",")
