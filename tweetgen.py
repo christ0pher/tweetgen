@@ -7,10 +7,10 @@ from keras.optimizers import SGD
 
 __author__ = 'christopher@levire.com'
 
-USER = "janboehm"
+USER = "khloekardashian"
 TRAIN_CSV = "./train_data/"+USER+".csv"
 TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
-TRAIN_VOCAB_CSV = "./train_data/"+USER+"_meta.csv"
+TRAIN_VOCAB_CSV = "./train_data/"+USER+"_vocab.csv"
 MODEL_FILE = "./models/" + USER + ".model"
 
 if __name__ == "__main__":
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         name="target_one_hot"
     )(target_input)
 
-    word_embedding = Dense(128, activation="linear")
+    word_embedding = Dense(1024, activation="linear")
 
     w1_embedding = word_embedding(w1_one_hot)
     w2_embedding = word_embedding(w2_one_hot)
@@ -68,18 +68,18 @@ if __name__ == "__main__":
 
     embedding = Concatenate()([w1_embedding, w2_embedding, w3_embedding])
 
-    hidden = Dense(256, activation="sigmoid")(embedding)
-    prediction_layer = Dense(vec_len, activation="softmax")(hidden)
+    hidden = Dense(512, activation="sigmoid")(embedding)
+
+    hidden2 = Dense(128, activation="hard_sigmoid")(hidden)
+    prediction_layer = Dense(vec_len, activation="softmax")(hidden2)
 
     model = Model(inputs=[w1_input, w2_input, w3_input, target_input], outputs=prediction_layer)
 
-    sgd = SGD(lr=.01)
-
-    model.compile(optimizer=sgd, loss="categorical_crossentropy", metrics=["categorical_accuracy"], target_tensors=[target_one_hot])
+    model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["categorical_accuracy"], target_tensors=[target_one_hot])
 
     print(model.summary())
 
-    h = model.fit(x=[trainings_set["w1"], trainings_set["w2"], trainings_set["w3"], trainings_set["target"]], verbose=2, epochs=500)
+    h = model.fit(x=[trainings_set["w1"], trainings_set["w2"], trainings_set["w3"], trainings_set["target"]], verbose=1, epochs=200, batch_size=500)
 
     model.save(MODEL_FILE)
 
