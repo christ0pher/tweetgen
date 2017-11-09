@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     vocab_list = pd.read_csv(TRAIN_VOCAB_CSV, engine="python", sep=",")
 
-    model = load_model(MODEL_FILE, custom_objects={"tf": tf})  # hacky as shit
+    model = load_model(MODEL_FILE, custom_objects={"tf": tf})
 
     for tweet in range(tweets):
         while True:
