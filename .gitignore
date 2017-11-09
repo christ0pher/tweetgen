@@ -1,2 +1,8 @@
 .idea/
 venv/
+twitter_credentials.py
+Graph
+models
+raw_data
+train_data
+
