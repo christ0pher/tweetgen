@@ -1,3 +1,4 @@
+import vocabulary
 import sys
 import random
 import numpy as np
@@ -6,15 +7,14 @@ import tensorflow as tf
 from keras.models import load_model
 
 
-def generate_next_word(word1, word2, word3, model, vocab_list, head=5):
-    w1 = np.array([vocab_list[vocab_list["word"] == word1]["index"].values[0]])
-    w2 = np.array([vocab_list[vocab_list["word"] == word2]["index"].values[0]])
-    w3 = np.array([vocab_list[vocab_list["word"] == word3]["index"].values[0]])
+def generate_next_word(word1, word2, word3, model, vocab, head=5):
+    w1 = np.array([vocabulary.word_index(vocab, word1)])
+    w2 = np.array([vocabulary.word_index(vocab, word2)])
+    w3 = np.array([vocabulary.word_index(vocab, word3)])
     prediction = model.predict(x=[w1, w2, w3]).flatten()
 
     indices = np.argsort(-prediction)[:head]
-
-    return vocab_list["word"][indices[random.randint(0, head-1)]]
+    return vocabulary.word(vocab, index=indices[random.randint(0, head - 1)])
 
 
 if __name__ == "__main__":

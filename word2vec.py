@@ -1,5 +1,6 @@
 import numpy
 import pandas as pd
+import vocabulary
 from keras import Input, callbacks
 from keras.engine import Model
 from keras.layers import Lambda, K, Dense
@@ -33,7 +34,7 @@ if __name__ == "__main__":
         TRAIN_META_CSV
     )
 
-    vocab_list = pd.read_csv(TRAIN_VOCAB_CSV)
+    vocab = vocabulary.load(TRAIN_VOCAB_CSV)
 
     if not exists(WORD2VEC_TRAIN):
         with open(RAW_TEXT, encoding="utf-8") as input_file:
@@ -42,13 +43,13 @@ if __name__ == "__main__":
                 for line in input_file:
                     words = line.split()
                     for i in range(0, len(words)):
-                        w = wtoint(words[i], vocab_list)
+                        w = wtoint(words[i], vocab)
                         if w is None:
                             continue
                         left_words = words[max(0, i-4):max(0, i-1)]
                         right_words = words[min(i+1, len(words)-1):min(i+4, len(words)-1)]
                         for context_word in left_words+right_words:
-                            cw = wtoint(context_word, vocab_list)
+                            cw = wtoint(context_word, vocab)
                             if w is not None and cw is not None:
                                 w2vf.write(str(w)+","+str(cw)+"\n")
 
@@ -92,26 +93,21 @@ if __name__ == "__main__":
                       ]
                       )
 
-    ########################################################################################
-
     loaded_model = get_w2v_model(vec_len)
     loaded_model.load_weights(WORD2VEC_TRAIN_MODEL, by_name=True)
 
-    p = loaded_model.predict(x=numpy.array([vocab_list[vocab_list["word"] == "great"]["index"].values[0]]))
+    p = loaded_model.predict(x=numpy.array([vocabulary.word_index(vocab, "great")]))
 
     distances = []
 
-    for word in vocab_list["word"]:
-        p_w = loaded_model.predict(x=numpy.array([vocab_list[vocab_list["word"] == word]["index"].values[0]]))
-        dist = numpy.linalg.norm(p.flatten().reshape((100,1)) - p_w.flatten().reshape((100,1)))
-        #print("Obamacare -> "+word+" distance: "+str(dist))
+    for word in vocab["word"]:
+        p_w = loaded_model.predict(x=numpy.array([vocabulary.word_index(vocab, word)]))
+        dist = numpy.linalg.norm(p.flatten().reshape((100,1)) - p_w.flatten().reshape((100, 1)))
         distances.append(("great", word, dist))
     sorted_distances = sorted(distances, key=lambda w: w[2])
     print(sorted_distances[:20])
 
-    ########################################################################################
-
-    word_centers, _ = get_kmeans(vocab_list, loaded_model)
+    word_centers, _ = get_kmeans(vocab, loaded_model)
     print(json.dumps(word_centers, indent=4, sort_keys=True))
 
 

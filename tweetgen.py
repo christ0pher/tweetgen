@@ -1,3 +1,4 @@
+import vocabulary
 import pandas as pd
 from keras import callbacks
 from keras_models.models import get_tweet_model, get_w2v_model
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     trainings_set = pd.read_csv(TRAIN_CSV)
     trainings_set = trainings_set.sample(frac=1).reset_index(drop=True)  # shuffle trainings data
 
-    vocab_list = pd.read_csv(TRAIN_VOCAB_CSV)
+    vocab = vocabulary.load(TRAIN_VOCAB_CSV)
 
     vec_len = meta_data["word_vec_len"][0]
 
