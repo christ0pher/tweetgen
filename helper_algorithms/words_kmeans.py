@@ -1,27 +1,24 @@
-from sklearn.cluster import KMeans
-
-__author__ = 'christopher@levire.com'
 import numpy
+from sklearn.cluster import KMeans
 
 
 def get_kmeans(vocab_list, w2v_model):
-    global word, p_w, word_centers, h
-    elems = []
+    vectors = []
     for word in vocab_list["word"]:
-        p_w = w2v_model.predict(x=numpy.array([vocab_list[vocab_list["word"] == word]["index"].values[0]]))
-        elems.append(p_w.flatten())
-    dataset = numpy.array(elems)
+        vec = w2v_model.predict(x=numpy.array([vocab_list[vocab_list["word"] == word]["index"].values[0]]))
+        vectors.append(vec.flatten())
+
     kmeans = KMeans(init="random", n_clusters=15)
-    kmeans.fit(dataset)
+    kmeans.fit(numpy.array(vectors))
 
     word_centers = {}
-    look_up_class = {}
+    clusters = {}
     for word in vocab_list["word"]:
-        p_w = w2v_model.predict(x=numpy.array([vocab_list[vocab_list["word"] == word]["index"].values[0]]))
-        klass = kmeans.predict(p_w.flatten().reshape(1, -1))[0]
-        h = str(klass)
+        vec = w2v_model.predict(x=numpy.array([vocab_list[vocab_list["word"] == word]["index"].values[0]]))
+        cluster = kmeans.predict(vec.flatten().reshape(1, -1))[0]
+        h = str(cluster)
         if h not in word_centers:
             word_centers[h] = []
         word_centers[h].append(word)
-        look_up_class[vocab_list[vocab_list["word"] == word]["index"].values[0]] = klass
-    return word_centers, look_up_class
+        clusters[vocab_list[vocab_list["word"] == word]["index"].values[0]] = cluster
+    return word_centers, clusters
