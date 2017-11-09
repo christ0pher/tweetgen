@@ -3,7 +3,6 @@ from keras import callbacks
 from keras_models.models import get_tweet_model, get_w2v_model
 
 USER = "macbosse"
-
 TRAIN_CSV = "./train_data/"+USER+".csv"
 TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
 TRAIN_VOCAB_CSV = "./train_data/"+USER+"_vocab.csv"
@@ -18,7 +17,7 @@ if __name__ == "__main__":
     )
 
     trainings_set = pd.read_csv(TRAIN_CSV)
-    trainings_set = trainings_set.sample(frac=1).reset_index(drop=True) #shuffle trainingsdata
+    trainings_set = trainings_set.sample(frac=1).reset_index(drop=True)  # shuffle trainings data
 
     vocab_list = pd.read_csv(TRAIN_VOCAB_CSV)
 
@@ -40,9 +39,25 @@ if __name__ == "__main__":
     print(model.summary())
 
     h = model.fit(x=[trainings_set["w1"], trainings_set["w2"], trainings_set["w3"], trainings_set["target"]],
-                  verbose=1, epochs=1000, batch_size=500, callbacks=[
-                          callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True),
-                          callbacks.ModelCheckpoint(MODEL_FILE, monitor='loss', verbose=0, save_best_only=True,save_weights_only=False, mode='auto', period=1),
+                  verbose=1,
+                  epochs=1000,
+                  batch_size=500,
+                  callbacks=[
+                          callbacks.TensorBoard(
+                              log_dir='./Graph',
+                              histogram_freq=0,
+                              write_graph=True,
+                              write_images=True
+                          ),
+                          callbacks.ModelCheckpoint(
+                              MODEL_FILE,
+                              monitor='loss',
+                              verbose=0,
+                              save_best_only=True,
+                              save_weights_only=False,
+                              mode='auto',
+                              period=1
+                          ),
                           callbacks.EarlyStopping(monitor='loss', patience=5, verbose=0, mode='auto', min_delta=0.01)
                       ])
 
