@@ -1,15 +1,13 @@
 import pandas as pd
 from keras import callbacks
-
 from keras_models.models import get_tweet_model, get_w2v_model
 
-__author__ = 'christopher@levire.com'
+USER = "macbosse"
 
-USER = "realDonaldTrump"
 TRAIN_CSV = "./train_data/"+USER+".csv"
 TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
 TRAIN_VOCAB_CSV = "./train_data/"+USER+"_vocab.csv"
-MODEL_FILE = "./models/" + USER + ".model"
+MODEL_FILE = "./models/"+USER+".model"
 WORD2VEC_TRAIN_MODEL = "./models/"+USER+"_w2v.model"
 
 

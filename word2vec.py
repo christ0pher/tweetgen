@@ -13,7 +13,7 @@ from keras_models.models import get_w2v_model
 
 __author__ = 'christopher@levire.com'
 
-USER = "realDonaldTrump"
+USER = "macbosse"
 TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
 TRAIN_VOCAB_CSV = "./train_data/"+USER+"_vocab.csv"
 WORD2VEC_TRAIN = "./train_data/"+USER+"_w2v.csv"
