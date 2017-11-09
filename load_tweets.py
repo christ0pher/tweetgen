@@ -6,7 +6,6 @@ from twitter_credentials import CONFIG
 
 BATCHES = 180
 USER = "khloekardashian"
-OUTPUT_FILE = "./raw_data/"+USER+".txt"
 FRQ_CAP = 2
 TRAIN_CSV = "./train_data/"+USER+".csv"
 TRAIN_METADATA = "./train_data/"+USER+"_meta.csv"
@@ -39,7 +38,7 @@ if __name__ == "__main__":
     remover = "https://t.co/[a-zA-Z0-9]{10,10}"
 
     rate_limit = results.rate_limit_remaining
-    with open(OUTPUT_FILE, "w+") as rf:
+    with open(RAW_TEXT, "w+") as rf:
         for limit in range(1, int(BATCHES)):
 
             for msg in results:
