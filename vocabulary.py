@@ -6,8 +6,14 @@ def load(filename):
 
 
 def word_index(vocab, word):
-    return vocab[vocab["word"] == word]["index"].values[0]
+    try:
+        return vocab[vocab["word"] == word]["index"].values[0]
+    except IndexError:
+        return None
 
 
 def word(vocab, index):
-    return vocab["word"][index]
+    try:
+        return vocab["word"][index]
+    except IndexError:
+        return None
