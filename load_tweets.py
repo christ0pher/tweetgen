@@ -1,30 +1,11 @@
 import re
-
+import os
+import ssl
 from twitter import Twitter, OAuth
-
 from twitter_credentials import CONFIG
 
 BATCHES = 180
-
-__author__ = 'christopher@levire.com'
-
-
-class CharStipper(dict):
-
-    def __getitem__(self, k):
-        el = chr(k)
-        if el in "!$%&'()*+,-./:;<=>?[\]^_`{|}~\"":
-            return None
-        else:
-            return k
-
-import os, ssl
-if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
-    getattr(ssl, '_create_unverified_context', None)):
-    ssl._create_default_https_context = ssl._create_unverified_context
-
 USER = "khloekardashian"
-
 OUTPUT_FILE = "./raw_data/"+USER+".txt"
 FRQ_CAP = 2
 TRAIN_CSV = "./train_data/"+USER+".csv"
@@ -32,12 +13,25 @@ TRAIN_METADATA = "./train_data/"+USER+"_meta.csv"
 TRAIN_VOCAB = "./train_data/"+USER+"_vocab.csv"
 RAW_TEXT = "./raw_data/"+USER+".txt"
 
+
+class CharStripper(dict):
+    def __getitem__(self, k):
+        el = chr(k)
+        if el in "!$%&'()*+,-./:;<=>?[\]^_`{|}~\"":
+            return None
+        else:
+            return k
+
+
+if not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None):
+    ssl._create_default_https_context = ssl._create_unverified_context
+
 if __name__ == "__main__":
 
     twitter_auth = OAuth(CONFIG["access_key"],
-                      CONFIG["access_secret"],
-                      CONFIG["consumer_key"],
-                      CONFIG["consumer_secret"])
+                         CONFIG["access_secret"],
+                         CONFIG["consumer_key"],
+                         CONFIG["consumer_secret"])
 
     stream = Twitter(auth=twitter_auth, secure=True)
     results = stream.statuses.user_timeline(screen_name=USER, count=200)
@@ -51,10 +45,8 @@ if __name__ == "__main__":
             for msg in results:
                 if "retweeted_status" not in msg:
                     txt = re.sub(remover, '', msg["text"])
-                    txt = txt.translate(CharStipper()).replace("\n", "")
+                    txt = txt.translate(CharStripper()).replace("\n", "")
                     rf.write(txt+"\n")
-
-
 
             results = stream.statuses.user_timeline(screen_name=USER, count=200, max_id=results[-1]["id"])
 
@@ -85,7 +77,7 @@ if __name__ == "__main__":
         one_hot_index += 1
     print(vocab_list)
 
-    # Make trainingsset
+    # Create trainings set
     m = 0
     with open(TRAIN_CSV, "w+") as output_file:
         output_file.write("w1,w2,w3,target\n")

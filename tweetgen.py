@@ -4,8 +4,6 @@ from keras.engine import Model
 from keras.layers import Lambda, Dense, Concatenate
 import keras.backend as K
 
-__author__ = 'christopher@levire.com'
-
 USER = "khloekardashian"
 TRAIN_CSV = "./train_data/"+USER+".csv"
 TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
@@ -74,11 +72,25 @@ if __name__ == "__main__":
 
     model = Model(inputs=[w1_input, w2_input, w3_input, target_input], outputs=prediction_layer)
 
-    model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["categorical_accuracy"], target_tensors=[target_one_hot])
+    model.compile(
+        optimizer="rmsprop",
+        loss="categorical_crossentropy",
+        metrics=["categorical_accuracy"],
+        target_tensors=[target_one_hot]
+    )
 
     print(model.summary())
 
-    h = model.fit(x=[trainings_set["w1"], trainings_set["w2"], trainings_set["w3"], trainings_set["target"]], verbose=1, epochs=200, batch_size=500)
+    h = model.fit(
+        x=[trainings_set["w1"],
+           trainings_set["w2"],
+           trainings_set["w3"],
+           trainings_set["target"]
+           ],
+        verbose=1,
+        epochs=200,
+        batch_size=500
+    )
 
     model.save(MODEL_FILE)
 
