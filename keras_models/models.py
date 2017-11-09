@@ -2,11 +2,8 @@ from keras import Input
 from keras.engine import Model
 from keras.layers import Lambda, Dense, Concatenate, K
 
-__author__ = 'christopher@levire.com'
-
 
 def get_w2v_model(vec_len):
-    global loaded_model
     word_input = Input(shape=(1,), dtype="int32")
     word_input_hot = Lambda(
         K.one_hot,
@@ -15,16 +12,15 @@ def get_w2v_model(vec_len):
         name="w1_input_hot"
     )(word_input)
     encoding_layer_predict = Dense(100, activation="linear", name="encoding_layer")(word_input_hot)
-    loaded_model = Model(inputs=[word_input], outputs=encoding_layer_predict)
-    loaded_model.compile(optimizer="sgd", loss="categorical_crossentropy",
-                         metrics=["categorical_accuracy", 'binary_accuracy'],
-                         target_tensors=[encoding_layer_predict])
+    model = Model(inputs=[word_input], outputs=encoding_layer_predict)
+    model.compile(optimizer="sgd", loss="categorical_crossentropy",
+                  metrics=["categorical_accuracy", 'binary_accuracy'],
+                  target_tensors=[encoding_layer_predict])
 
-    return loaded_model
+    return model
 
 
 def get_tweet_model(vec_len):
-    global model
     w1_input = Input(shape=(1,), dtype="int32")
     w2_input = Input(shape=(1,), dtype="int32")
     w3_input = Input(shape=(1,), dtype="int32")
