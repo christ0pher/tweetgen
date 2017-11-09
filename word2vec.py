@@ -6,12 +6,8 @@ from keras.layers import Lambda, K, Dense
 from keras.metrics import top_k_categorical_accuracy
 from os.path import exists
 import json
-from sklearn.cluster import KMeans
-
 from helper_algorithms.words_kmeans import get_kmeans
 from keras_models.models import get_w2v_model
-
-__author__ = 'christopher@levire.com'
 
 USER = "macbosse"
 TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
