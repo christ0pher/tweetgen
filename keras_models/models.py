@@ -3,23 +3,6 @@ from keras.engine import Model
 from keras.layers import Lambda, Dense, Concatenate, K
 
 
-def get_w2v_model(vec_len):
-    word_input = Input(shape=(1,), dtype="int32")
-    word_input_hot = Lambda(
-        K.one_hot,
-        arguments={"num_classes": vec_len},
-        output_shape=(1, vec_len),
-        name="w1_input_hot"
-    )(word_input)
-    encoding_layer_predict = Dense(100, activation="linear", name="encoding_layer")(word_input_hot)
-    model = Model(inputs=[word_input], outputs=encoding_layer_predict)
-    model.compile(optimizer="sgd", loss="categorical_crossentropy",
-                  metrics=["categorical_accuracy", 'binary_accuracy'],
-                  target_tensors=[encoding_layer_predict])
-
-    return model
-
-
 def get_tweet_model(vec_len):
     w1_input = Input(shape=(1,), dtype="int32")
     w2_input = Input(shape=(1,), dtype="int32")
