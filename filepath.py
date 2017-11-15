@@ -19,3 +19,7 @@ def for_trainings_set_file(user, suffix=None):
 
 def for_w2v_model(user):
     return "./models/"+user+"_w2v.model"
+
+
+def for_tweet_model(user):
+    return "./models/"+user+".model"
