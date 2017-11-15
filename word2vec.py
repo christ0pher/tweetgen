@@ -1,6 +1,8 @@
 import numpy
 import pandas as pd
 import vocabulary
+import filepath
+import trainingsset
 from keras import Input, callbacks
 from keras.engine import Model
 from keras.layers import Lambda, K, Dense
@@ -11,53 +13,28 @@ from helper_algorithms.words_kmeans import get_kmeans
 from keras_models.models import get_w2v_model
 
 USER = "macbosse"
-TRAIN_META_CSV = "./train_data/"+USER+"_meta.csv"
-TRAIN_VOCAB_CSV = "./train_data/"+USER+"_vocab.csv"
-WORD2VEC_TRAIN = "./train_data/"+USER+"_w2v.csv"
-WORD2VEC_TRAIN_MODEL = "./models/"+USER+"_w2v.model"
-RAW_TEXT = "./raw_data/"+USER+".txt"
-
 
 def top_3_accuracy(y_true, y_pred):
     return top_k_categorical_accuracy(y_true, y_pred, k=3)
 
 
-def wtoint(w, vocab):
-    if len(vocab[vocab["word"] == w]["index"]) == 1:
-        return vocab[vocab["word"] == w]["index"].values[0]
-    return None
-
-
 if __name__ == "__main__":
+    print("Loading vocabulary for %s." % USER)
+    vocab = vocabulary.load(filepath.for_vocabulary_file(USER))
 
-    meta_data = pd.read_csv(
-        TRAIN_META_CSV
-    )
+    if not exists(filepath.for_skip_gram_file(USER)):
+        print("No skip gram trainings set exists for %s. Generating new trainings set ..." % USER)
+        trainings_set = trainingsset.generate_skip_gram(filepath.for_raw_text_file(USER), vocab, 3)
+        trainings_set.to_csv(filepath.for_skip_gram_file(USER), index=False)
+        print("DONE")
+    else:
+        print("Loading skip gram trainings set for %s." % USER)
+        trainings_set = pd.read_csv(filepath.for_skip_gram_file(USER))
 
-    vocab = vocabulary.load(TRAIN_VOCAB_CSV)
+    vec_len = len(vocab)
 
-    if not exists(WORD2VEC_TRAIN):
-        with open(RAW_TEXT, encoding="utf-8") as input_file:
-            with open(WORD2VEC_TRAIN, "w+") as w2vf:
-                w2vf.write("word,context_word\n")
-                for line in input_file:
-                    words = line.split()
-                    for i in range(0, len(words)):
-                        w = wtoint(words[i], vocab)
-                        if w is None:
-                            continue
-                        left_words = words[max(0, i-4):max(0, i-1)]
-                        right_words = words[min(i+1, len(words)-1):min(i+4, len(words)-1)]
-                        for context_word in left_words+right_words:
-                            cw = wtoint(context_word, vocab)
-                            if w is not None and cw is not None:
-                                w2vf.write(str(w)+","+str(cw)+"\n")
-
-    trainings_set = pd.read_csv(WORD2VEC_TRAIN)
-
-    vec_len = meta_data["word_vec_len"][0]
-
-    if not exists(WORD2VEC_TRAIN_MODEL):
+    w2v_model_path = filepath.for_w2v_model(USER)
+    if not exists(w2v_model_path):
         w1 = Input(shape=(1,), dtype="int32")
         w2 = Input(shape=(1,), dtype="int32")
 
@@ -84,17 +61,17 @@ if __name__ == "__main__":
         model.compile(optimizer="rmsprop", loss="categorical_crossentropy", metrics=["categorical_accuracy", 'binary_accuracy'],
                       target_tensors=[w2_input_hot])
 
-        h = model.fit(x=[trainings_set["word"], trainings_set["context_word"]], verbose=1,
+        h = model.fit(x=[trainings_set["word"], trainings_set["context"]], verbose=1,
                       epochs=50, batch_size=1000,
                       callbacks=[
                           callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True),
-                          callbacks.ModelCheckpoint(WORD2VEC_TRAIN_MODEL, monitor='loss', verbose=0, save_best_only=True,save_weights_only=True, mode='auto', period=5),
+                          callbacks.ModelCheckpoint(w2v_model_path, monitor='loss', verbose=0, save_best_only=True,save_weights_only=True, mode='auto', period=5),
                           #callbacks.EarlyStopping(monitor='loss', patience=2, verbose=0, mode='auto', min_delta=0.01)
                       ]
                       )
 
     loaded_model = get_w2v_model(vec_len)
-    loaded_model.load_weights(WORD2VEC_TRAIN_MODEL, by_name=True)
+    loaded_model.load_weights(w2v_model_path, by_name=True)
 
     p = loaded_model.predict(x=numpy.array([vocabulary.word_index(vocab, "great")]))
 
