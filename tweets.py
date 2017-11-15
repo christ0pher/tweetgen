@@ -84,6 +84,6 @@ if __name__ == "__main__":
     print("DONE")
 
     print("Creating n-gram trainings set ...")
-    trainings_set = trainingsset.generate_ngram_to_next_word(filepath.for_raw_text_file(user), vocab)
+    trainings_set = trainingsset.generate_n_gram_to_next_word(filepath.for_raw_text_file(user), vocab)
     trainings_set.to_csv(filepath.for_trainings_set_file(user), index=False)
     print("DONE")

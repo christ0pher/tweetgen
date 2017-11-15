@@ -2,7 +2,7 @@ import vocabulary
 import pandas as pd
 
 
-def generate_ngram_to_next_word(text_file, vocab, n=None, encoding=None):
+def generate_n_gram_to_next_word(text_file, vocab, n=None, encoding=None):
     n = 3 if n is None else n
     encoding = "utf8" if encoding is None else encoding
 
